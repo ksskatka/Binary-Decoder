@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include <sstream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -65,7 +67,43 @@ void PrintCodes(Node* root, string stringCode) {
     PrintCodes(root->right, stringCode + "1");
 }
 
-//TODO: IMPLEMENT DECOMPRESSION ALGORITHM!
+void Decompress(Node* root, ifstream &inFile) {
+    vector<string> codes;
+    string tempString;
+    string code;
+    string pos;
+
+    char insert = ' ';
+    Node* currNode = root;
+    string decodedMsg = "";
+    int msgSize = 0;
+    while (getline(inFile, tempString)) {
+        stringstream ss(tempString);
+        ss >> code;
+
+        for (int i = 0; i < code.length(); i++) {
+            if (code[i] == '0') {
+                currNode = currNode->left;
+            } else {
+                currNode = currNode->right;
+            }
+            if (currNode->left == nullptr && currNode->right == nullptr) {
+                insert = currNode->symbol;
+                currNode = root;
+            }
+        }
+        while (ss >> pos) {
+            int i = stoi(pos);
+            if ((i + 1) > msgSize) {
+                msgSize = (i + 1);
+                decodedMsg.resize(msgSize);
+            }
+            decodedMsg[i] = insert;
+
+        }
+    }
+    cout << decodedMsg;
+}
 
 int main() {
 
@@ -98,5 +136,12 @@ int main() {
     Node* rootNode = CreateHuffTree(charArr, intArr, size_count);
     PrintCodes(rootNode, "");
 
+    fileIn.close();
+
+    fileInName = ""; cin >> fileInName; fileIn.open(fileInName);
+
+    Decompress(rootNode, fileIn);
+
+    fileIn.close();
     return 0;
 }
