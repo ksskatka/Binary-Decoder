@@ -90,8 +90,19 @@ Node* CreateHuffTree(char symbols[], int tuples[], int ARR_SIZE) {
         priorityQueue.push(top);
     }
     return priorityQueue.top();
-
 }
+
+//delete the binary tree for memory safety
+void DeleteTree(Node* node) 
+{ 
+    if (node == NULL) {
+        return;
+    }
+    DeleteTree(node->left); 
+    DeleteTree(node->right); 
+
+    delete node;
+} 
 
 //prints the symbol, frequency, and code of each huffman tree node
 void PrintCodes(Node* root, string stringCode) {
@@ -174,5 +185,6 @@ int main(int argc, char* argv[]) {
     }
     wait(0);
     close(sockfd);
+    DeleteTree(rootNode);
     return 0;
 }
